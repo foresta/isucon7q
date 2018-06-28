@@ -5,3 +5,4 @@ cd $DB_DIR
 
 mysql -uroot -e "DROP DATABASE IF EXISTS isubata; CREATE DATABASE isubata;"
 mysql -uroot isubata < ./isubata.sql
+mysql -uroot isubata < ./alter.sql
