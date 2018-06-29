@@ -384,7 +384,8 @@ func getMessage(c echo.Context) error {
 	query := `
 	SELECT message.*, user.name, user.display_name, user.avatar_icon FROM
 	(SELECT * FROM message WHERE id > ? AND channel_id = ? ORDER BY id DESC LIMIT 100) as message
-	INNER JOIN user ON message.user_id = user.id`
+	INNER JOIN user ON message.user_id = user.id
+	ORDER BY message.id DESC`
 
 	rows, err := db.Query(query, lastID, chanID)
 	if err != nil {
