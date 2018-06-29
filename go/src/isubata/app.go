@@ -381,6 +381,83 @@ func getMessage(c echo.Context) error {
 		return err
 	}
 
+	query := `
+	SELECT message.*, user.name, user.display_name, user.aavaar_icon FROM
+	(SELECT * FROM message WHERE id > ? AND channel_id = ? ORDER BY id DESC LIMIT 100) as message
+	INNER JOIN user ON message.user_id = user.id`
+
+	rows, err := db.Query(query, lastID, chanID)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	response := make([]map[string]interface{}, 0)
+	var lastMessageID int64
+	for rows.Next() {
+		// message
+		var messageID int64
+		var channelID int64
+		var userID int64
+		var content string
+		var createdAt time.Time
+
+		// user
+		var userName string
+		var userDisplayName string
+		var userAvatarIcon string
+		err := rows.Scan(&messageID, &channelID, &userID, &content, &createdAt, &userName, &userDisplayName, &userAvatarIcon)
+		if err != nil {
+			return nil
+		}
+
+		if lastMessageID < messageID {
+			lastMessageID = messageID
+		}
+
+		u := User{
+			Name:        userName,
+			DisplayName: userDisplayName,
+			AvatarIcon:  userAvatarIcon,
+		}
+
+		r := make(map[string]interface{})
+		r["id"] = messageID
+		r["user"] = u
+		r["date"] = createdAt.Format("2006/01/02 15:04:05")
+		r["content"] = content
+
+		response = append(response, r)
+	}
+
+	if lastMessageID > 0 {
+		_, err := db.Exec("INSERT INTO haveread (user_id, channel_id, message_id, updated_at, created_at)"+
+			" VALUES (?, ?, ?, NOW(), NOW())"+
+			" ON DUPLICATE KEY UPDATE message_id = ?, updated_at = NOW()",
+			userID, chanID, lastMessageID, lastMessageID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func getMessageOld(c echo.Context) error {
+	userID := sessUserID(c)
+	if userID == 0 {
+		return c.NoContent(http.StatusForbidden)
+	}
+
+	chanID, err := strconv.ParseInt(c.QueryParam("channel_id"), 10, 64)
+	if err != nil {
+		return err
+	}
+	lastID, err := strconv.ParseInt(c.QueryParam("last_message_id"), 10, 64)
+	if err != nil {
+		return err
+	}
+
 	messages, err := queryMessages(chanID, lastID)
 	if err != nil {
 		return err
