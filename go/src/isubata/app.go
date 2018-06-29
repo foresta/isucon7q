@@ -411,7 +411,7 @@ func getMessage(c echo.Context) error {
 		var userAvatarIcon string
 		err := rows.Scan(&messageID, &channelID, &userID, &content, &createdAt, &userName, &userDisplayName, &userAvatarIcon)
 		if err != nil {
-			return nil
+			return err
 		}
 
 		if lastMessageID < messageID {
