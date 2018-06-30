@@ -598,7 +598,7 @@ func getHistory(c echo.Context) error {
 	}
 
 	query := `
-	SELECT message.* user.name, user.display_name, user.avatar_icon
+	SELECT message.*, user.name, user.display_name, user.avatar_icon
 	FROM (SELECT * FROM message WHERE channel_id = ? ORDER BY id DESC LIMIT ? OFFSET ?) AS message
 	INNER JOIN user ON message.user_id = user.id
 	ORDER BY message.id ASC
