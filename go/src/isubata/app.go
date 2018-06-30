@@ -522,38 +522,41 @@ func fetchUnread(c echo.Context) error {
 
 	time.Sleep(time.Second)
 
-	channels, err := queryChannels()
+	query := `
+	SELECT channel.id AS channel_id,
+	CASE 
+	WHEN haveread.message_id IS NULL THEN 
+		(SELECT COUNT(1) as cnt FROM message WHERE channel_id = channel.id)
+	ELSE 
+        (SELECT COUNT(1) as cnt FROM message WHERE channel_id = channel.id AND haveread.message_id < id)
+	END AS unread
+	FROM channel 
+	LEFT JOIN haveread 
+		ON haveread.channel_id = channel.id AND user_id = ?;
+	`
+
+	rows, err := db.Query(query, userID)
 	if err != nil {
 		return err
 	}
+	defer rows.Close()
 
 	resp := []map[string]interface{}{}
 
-	for _, chID := range channels {
-		lastID, err := queryHaveRead(userID, chID)
+	for rows.Next() {
+		var channelID int64
+		var unread int
+
+		err := rows.Scan(&channelID, &unread)
 		if err != nil {
 			return err
 		}
 
-		var cnt int64
-		if lastID > 0 {
-			err = db.Get(&cnt,
-				"SELECT COUNT(1) as cnt FROM message WHERE channel_id = ? AND ? < id",
-				chID, lastID)
-		} else {
-			err = db.Get(&cnt,
-				"SELECT COUNT(1) as cnt FROM message WHERE channel_id = ?",
-				chID)
-		}
-		if err != nil {
-			return err
-		}
 		r := map[string]interface{}{
-			"channel_id": chID,
-			"unread":     cnt}
+			"channel_id": channelID,
+			"unread":     unread}
 		resp = append(resp, r)
 	}
-
 	return c.JSON(http.StatusOK, resp)
 }
 
