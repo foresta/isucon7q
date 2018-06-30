@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	crand "crypto/rand"
 	"crypto/sha1"
 	"database/sql"
@@ -751,6 +752,16 @@ func postProfile(c echo.Context) error {
 		if err != nil {
 			return err
 		}
+
+		// write to File
+		filepath := "/home/isucon/isubata/webapp/public/icons/" + avatarName
+		file, err := os.Create(filepath)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		buffer := bytes.NewBuffer(avatarData)
+		io.Copy(file, buffer)
 	}
 
 	if name := c.FormValue("display_name"); name != "" {
