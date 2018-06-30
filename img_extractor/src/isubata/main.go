@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -79,6 +80,7 @@ func main() {
 		}
 		defer file.Close()
 
-		io.Copy(file, data)
+		buffer := bytes.NewBuffer(data)
+		io.Copy(file, buffer)
 	}
 }
