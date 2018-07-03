@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -877,5 +878,12 @@ func main() {
 	e.POST("add_channel", postAddChannel)
 	e.GET("/icons/:file_name", getIcon)
 
+	file := "/dev/shm/app.sock"
+	os.Remove(file)
+	l, err := net.Listen("unix", file)
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
+	e.Listener = l
 	e.Start(":5000")
 }
