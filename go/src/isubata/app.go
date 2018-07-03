@@ -886,4 +886,9 @@ func main() {
 	}
 	e.Listener = l
 	e.Start("")
+
+	err := os.Chmod(file, 0777)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
