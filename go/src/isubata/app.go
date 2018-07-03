@@ -884,11 +884,13 @@ func main() {
 	if err != nil {
 		e.Logger.Fatal(err)
 	}
-	e.Listener = l
-	e.Start("")
 
 	err := os.Chmod(file, 0777)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	e.Listener = l
+	e.Start("")
+
 }
