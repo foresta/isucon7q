@@ -773,12 +773,8 @@ func postProfile(c echo.Context) error {
 		avatarName = fmt.Sprintf("%x%s", sha1.Sum(avatarData), ext)
 	}
 
+	isUpdateAvatar := false
 	if avatarName != "" && len(avatarData) > 0 {
-		_, err = db.Exec("UPDATE user SET avatar_icon = ? WHERE id = ?", avatarName, self.ID)
-		if err != nil {
-			return err
-		}
-
 		// write to File
 		filepath := "/home/isucon/isubata/webapp/public/icons/" + avatarName
 		file, err := os.Create(filepath)
@@ -788,13 +784,31 @@ func postProfile(c echo.Context) error {
 		defer file.Close()
 		buffer := bytes.NewBuffer(avatarData)
 		io.Copy(file, buffer)
+
+		isUpdateAvatar = true
 	}
 
-	if name := c.FormValue("display_name"); name != "" {
-		_, err := db.Exec("UPDATE user SET display_name = ? WHERE id = ?", name, self.ID)
+	displayName := c.FormValue("display_name")
+	if displayName != "" && isUpdateAvatar {
+		// avater_icon, display_nameの更新
+		_, err := db.Exec("UPDATE user SET display_name = ?, avatar_icon = ? WHERE id = ?", displayName, avatarName, self.ID)
 		if err != nil {
 			return err
 		}
+	} else if displayName != "" {
+		// display_nameのみ更新
+		_, err := db.Exec("UPDATE user SET display_name = ? WHERE id = ?", displayName, self.ID)
+		if err != nil {
+			return err
+		}
+	} else if isUpdateAvatar {
+		// avatar_iconのみ更新
+		_, err = db.Exec("UPDATE user SET avatar_icon = ? WHERE id = ?", avatarName, self.ID)
+		if err != nil {
+			return err
+		}
+	} else {
+		// nop
 	}
 
 	return c.Redirect(http.StatusSeeOther, "/")
