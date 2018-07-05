@@ -81,6 +81,7 @@ func init() {
 	}
 
 	db.SetMaxOpenConns(20)
+	db.SetMaxIdleConns(20)
 	db.SetConnMaxLifetime(5 * time.Minute)
 	log.Printf("Succeeded to connect db.")
 }
