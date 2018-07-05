@@ -881,7 +881,7 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 
-	err := os.Chmod(file, 0777)
+	err = os.Chmod(file, 0777)
 	if err != nil {
 		log.Fatal(err)
 	}
