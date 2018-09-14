@@ -34,12 +34,18 @@
 [[projects]]
   branch = "master"
   name = "github.com/jmoiron/sqlx"
-  packages = [".","reflectx"]
+  packages = [
+    ".",
+    "reflectx"
+  ]
   revision = "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f"
 
 [[projects]]
   name = "github.com/labstack/echo"
-  packages = [".","middleware"]
+  packages = [
+    ".",
+    "middleware"
+  ]
   revision = "cec7629194fe4bf83b0c72d9a02d340c7a1468ac"
   version = "3.2.3"
 
@@ -51,7 +57,12 @@
 
 [[projects]]
   name = "github.com/labstack/gommon"
-  packages = ["bytes","color","log","random"]
+  packages = [
+    "bytes",
+    "color",
+    "log",
+    "random"
+  ]
   revision = "57409ada9da0f2afad6664c49502f8c50fbd8476"
   version = "0.2.3"
 
@@ -68,6 +79,12 @@
   version = "v0.0.3"
 
 [[projects]]
+  name = "github.com/sevenNt/echo-pprof"
+  packages = ["."]
+  revision = "8bdaf794e4583c013a089f3902aa140d45a5af1c"
+  version = "v0.1.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/valyala/bytebufferpool"
   packages = ["."]
@@ -82,7 +99,10 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["acme","acme/autocert"]
+  packages = [
+    "acme",
+    "acme/autocert"
+  ]
   revision = "9419663f5a44be8b34ca85f08abc5fe1be11f8a3"
 
 [[projects]]
@@ -94,6 +114,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9d36470f0563bf7a47836bd9683357e361e744892223667a231bf07b98f8882f"
+  inputs-digest = "7021518a40bc2b14278c36c53927f3d583be76626ec8830fe4b5788912f9869d"
   solver-name = "gps-cdcl"
   solver-version = 1

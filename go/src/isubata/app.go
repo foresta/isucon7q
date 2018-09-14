@@ -25,6 +25,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/middleware"
+	"github.com/sevenNt/echo-pprof"
 )
 
 const (
@@ -902,6 +903,9 @@ func main() {
 	}
 
 	e.Listener = l
+
+	echopprof.Wrap(e)
+
 	e.Start("")
 
 }
